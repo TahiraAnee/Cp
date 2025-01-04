@@ -1,1 +1,125 @@
-here is the code.
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long int ll;
+
+struct Sqrt {
+    ll block_size;
+    vector<ll> nums, blocks, lazy;
+    
+    Sqrt(ll sqrtn, vector<ll> &arr) : block_size(sqrtn), blocks(sqrtn, 0), lazy(sqrtn, 0) {
+        nums = arr;
+        for (ll i = 0; i < nums.size(); i++) {
+            blocks[i / block_size] += nums[i];
+        }
+    }
+
+    /** Apply pending lazy updates to block */
+    void apply_lazy(ll block_idx) {
+        if (lazy[block_idx] != 0) {
+            ll start = block_idx * block_size;
+            ll end = min((block_idx + 1) * block_size, (ll)nums.size());
+            for (ll i = start; i < end; i++) {
+                nums[i] += lazy[block_idx];
+            }
+            blocks[block_idx] += lazy[block_idx] * (end - start);
+            lazy[block_idx] = 0;
+        }
+    }
+
+    /** O(1) update to set nums[x] to v */
+    // void update(ll x, ll v) {
+    //     ll block_idx = x / block_size;
+    //     apply_lazy(block_idx);  // Ensure lazy updates are applied
+    //     blocks[block_idx] -= nums[x];
+    //     nums[x] = v;
+    //     blocks[block_idx] += nums[x];
+    // }
+
+    /** O(sqrt(n)) range update for [l, r) */
+    void update_range(ll l, ll r, ll v) {
+        ll start_block = l / block_size;
+        ll end_block = (r - 1) / block_size;
+
+        apply_lazy(start_block);  // Apply lazy for start block
+        apply_lazy(end_block);    // Apply lazy for end block
+
+        if (start_block == end_block) {
+            for (ll i = l; i < r; i++) {
+                nums[i] += v;
+                blocks[start_block] += v;
+            }
+        } else {
+            // Update start block
+            for (ll i = l; i < (start_block + 1) * block_size; i++) {
+                nums[i] += v;
+                blocks[start_block] += v;
+            }
+            // Mark lazy updates for middle blocks
+            for (ll i = start_block + 1; i < end_block; i++) {
+                lazy[i] += v;
+            }
+            // Update end block
+            for (ll i = end_block * block_size; i < r; i++) {
+                nums[i] += v;
+                blocks[end_block] += v;
+            }
+        }
+    }
+
+    /** O(sqrt(n)) query for sum of [l, r) */
+    ll query(ll l, ll r) {
+        ll res = 0;
+        ll start_block = l / block_size;
+        ll end_block = (r - 1) / block_size;
+
+        apply_lazy(start_block);  // Apply lazy for start block
+        apply_lazy(end_block);    // Apply lazy for end block
+
+        if (start_block == end_block) {
+            for (ll i = l; i < r; i++) {
+                res += nums[i];
+            }
+        } else {
+            // Query start block
+            for (ll i = l; i < (start_block + 1) * block_size; i++) {
+                res += nums[i];
+            }
+            // Query middle blocks
+            for (ll i = start_block + 1; i < end_block; i++) {
+                res += blocks[i] + lazy[i] * block_size;
+            }
+            // Query end block
+            for (ll i = end_block * block_size; i < r; i++) {
+                res += nums[i];
+            }
+        }
+        return res;
+    }
+};
+
+int main() {
+    ll n, q;
+    cin >> n >> q;
+
+    vector<ll> arr(n);
+    for (ll i = 0; i < n; i++) { cin >> arr[i]; }
+    Sqrt sq((ll)ceil(sqrt(n)), arr);
+
+    for (ll i = 0; i < q; i++) {
+        ll t, l, r, v;
+        cin >> t;
+        if (t == 1) {  // Point update: set nums[l] to r
+            cin >> l >> r;
+            sq.update(l - 1, r);
+            
+        } else if (t == 2) {  // Range update: add v to [l, r)
+            cin >> l >> r >> v;
+            sq.update_range(l - 1, r, v);
+            
+        } else {  // Range query: sum of [l, r)
+            cin >> l >> r;
+            cout << sq.query(l - 1, r) << "\n";
+        }
+    }
+}
+
