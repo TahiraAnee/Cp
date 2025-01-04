@@ -66,6 +66,37 @@ struct Sqrt {
         }
     }
 
+    /** O(sqrt(n)) set range for [l, r) */
+    void set_range(ll l, ll r, ll v) {
+        ll start_block = l / block_size;
+        ll end_block = (r - 1) / block_size;
+
+        apply_lazy(start_block);  // Apply lazy for start block
+        apply_lazy(end_block);    // Apply lazy for end block
+
+        if (start_block == end_block) {
+            for (ll i = l; i < r; i++) {
+                nums[i] = v;
+                blocks[start_block] = v;
+            }
+        } else {
+            // Update start block
+            for (ll i = l; i < (start_block + 1) * block_size; i++) {
+                nums[i] = v;
+                blocks[start_block] = v;
+            }
+            // Mark lazy updates for middle blocks
+            for (ll i = start_block + 1; i < end_block; i++) {
+                lazy[i] = v;
+            }
+            // Update end block
+            for (ll i = end_block * block_size; i < r; i++) {
+                nums[i] = v;
+                blocks[end_block] = v;
+            }
+        }
+    }
+
     /** O(sqrt(n)) query for sum of [l, r) */
     ll query(ll l, ll r) {
         ll res = 0;
