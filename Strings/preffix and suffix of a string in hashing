@@ -1,0 +1,52 @@
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long int ll;
+#define endl "\n"
+#define pb push_back
+#define rep(i,n) for (int i = 0; i < (n); ++i)
+#define all(v) (v).begin(),(v).end()
+const ll mod=1e9+7,N=1e6+7;
+ll base=10;
+vector<ll>power(N+1,0);
+int32_t main()
+{
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    string st;
+    cin>>st;
+    ll n= st.size();
+    power[0]=1;
+    for(ll i=1;i<=N;i++)
+    {
+        power[i] =(power[i-1]*base)%mod;
+
+    }
+    vector<ll>hashPref(n+1,0);
+
+    for(ll i=0;i<n;i++)
+    {
+        hashPref[i+1] = (hashPref[i] + (st[i]-'a'+1) * power[i]) % mod;
+       // cout<<hashPref[i+1]<<" ";
+    }//cout<<endl;
+
+    vector<ll>hashSuf(n+1,0);
+    
+    for(ll i=n-1;i>=0;i--)
+    {
+       hashSuf[i] = (hashSuf[i + 1] * base + (st[i] - 'a' + 1)) % mod;
+      // cout << hashSuf[i] << " ";
+    }
+
+    for(ll i=1;i<n;i++)
+    {
+        //cout<<hashPref[i]<<" "<<hashSuf[n-i]<<endl;
+
+        if((hashPref[i]==hashSuf[n-i]) )
+        {
+            cout<<i<<" ";
+        }
+
+    }cout<<endl;
+
+
+}
