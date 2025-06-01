@@ -30,7 +30,7 @@ ll nCr(ll n , ll r)
 ll nPr(ll n,ll r)
 {
     if(n<r or n<0) return 0;
-     return (1LL * f[n] %mod * power(f[r],mod-2)%mod)%mod;
+     return (1LL * f[n] %mod * power(f[n-r],mod-2)%mod)%mod;
 }
 int32_t main()
 {
