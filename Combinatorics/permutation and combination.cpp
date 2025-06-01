@@ -21,30 +21,37 @@ ll power(ll n,ll k)
     }
     return ans;
 }
-ll f[N];
+ll f[N],invf[N];
 ll nCr(ll n , ll r)
 {
     if(n<r or n<0)return 0;
-    return (1LL * f[n] %mod * power(f[r],mod-2)%mod * power(f[n-r],mod-2))%mod;
+    return (1LL * f[n] %mod * invf[r]%mod * invf[n-r]%mod)%mod;
 }
 ll nPr(ll n,ll r)
 {
     if(n<r or n<0) return 0;
-     return (1LL * f[n] %mod * power(f[n-r],mod-2)%mod)%mod;
+     return (1LL * f[n] %mod * invf[n-r]%mod)%mod;
 }
 int32_t main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0);
+    // O(n) e factorial ber kora
     f[0]=1;
     for(ll i=1;i<N;i++)
     {
         f[i]=1LL*i*f[i-1]%mod;
     }
+    // O(n) e invfactorial ber kora
+    invf[N-1]=power(f[N-1],mod-2);
+    for(ll i=N-2;i>=0;i--)
+    {
+        invf[i]=1LL * invf[i+1]*(i+1)%mod;
+    }
     
        ll n,r;
        cin>>n>>r;
        cout<<nCr(6,2)<<endl;
-       cout<<nPr(4,2)<<endl;
+       cout<<nPr(6,2)<<endl;
     
 }
