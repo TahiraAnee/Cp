@@ -1,3 +1,5 @@
+//N array er max length,LG=array er max value er log value,1e9 hole 31,1e5 hole 20
+//m holo m size er array build kortechi
 const ll N = 1e6 + 7;
 const ll LG = 22;
 ll arr[N], t[N][LG];
